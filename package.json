@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "build": "npm run build:web",
+    "preview": "vite preview",
+    "build:web": "tsc -b && vite build",
+    "dev:desktop": "concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "dist:win": "npm run build:web && electron-builder --win nsis",
+    "dist:linux": "npm run build:web && electron-builder --linux AppImage"
   },
   "dependencies": {
     "@headlessui/react": "^2.1.8",
@@ -29,6 +33,38 @@
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
-    "vite-plugin-pwa": "^0.20.5"
+    "vite-plugin-pwa": "^0.20.5",
+    "concurrently": "^9.1.0",
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8",
+    "wait-on": "^8.0.1"
+  },
+  "main": "electron-main.cjs",
+  "build": {
+    "appId": "com.braistormer.engine",
+    "productName": "Brainstorming Engine",
+    "files": [
+      "dist/**/*",
+      "electron-main.cjs",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "build-resources"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
