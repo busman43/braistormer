@@ -1,4 +1,4 @@
-import type { ClarifyingAnswers, IdeaCategory, IdeaItem } from './types';
+import type { ArchiveAgentResult, ClarifyingAnswers, IdeaArchiveEntry, IdeaCategory, IdeaItem } from './types';
 
 const templates: Record<string, IdeaItem[]> = {
   'In-Person Activities': [
@@ -57,6 +57,47 @@ function tuneDescription(description: string, constraints: string, style: string
   return `${description}${budgetHint}${styleHint}`;
 }
 
+function normalize(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function extractScopedKeywords(answers: ClarifyingAnswers): string[] {
+  const text = `${answers.context} ${answers.constraints}`;
+  const words = normalize(text)
+    .split(' ')
+    .filter((word) => word.length > 4);
+
+  return [...new Set(words)].slice(0, 8);
+}
+
+function toArchiveEntries(categories: IdeaCategory[]): IdeaArchiveEntry[] {
+  return categories.flatMap((category) =>
+    category.ideas.map((idea) => ({
+      id: `${category.name}-${idea.title}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      category: category.name,
+      title: idea.title,
+      description: idea.description,
+      createdAt: new Date().toISOString()
+    }))
+  );
+}
+
+function isUnique(entry: IdeaArchiveEntry, existingArchive: IdeaArchiveEntry[]): boolean {
+  const normalizedTitle = normalize(entry.title);
+  const titleWords = new Set(normalizedTitle.split(' ').filter(Boolean));
+
+  return !existingArchive.some((saved) => {
+    const savedTitle = normalize(saved.title);
+    if (savedTitle === normalizedTitle) return true;
+
+    const overlap = savedTitle
+      .split(' ')
+      .filter((word) => word && titleWords.has(word)).length;
+
+    return overlap >= 2;
+  });
+}
+
 export function buildIdeas(answers: ClarifyingAnswers): IdeaCategory[] {
   const categories = selectCategories(answers.context);
 
@@ -74,4 +115,12 @@ export function buildIdeas(answers: ClarifyingAnswers): IdeaCategory[] {
       followUp: 'Want this transformed into a step-by-step plan or checklist?'
     };
   });
+}
+
+export function runIdeaArchiveAgent(answers: ClarifyingAnswers, categories: IdeaCategory[], existingArchive: IdeaArchiveEntry[]): ArchiveAgentResult {
+  const scopedKeywords = extractScopedKeywords(answers);
+  const generatedEntries = toArchiveEntries(categories);
+  const uniqueSuggestions = generatedEntries.filter((entry) => isUnique(entry, existingArchive)).slice(0, 10);
+
+  return { scopedKeywords, uniqueSuggestions };
 }

@@ -11,11 +11,6 @@ export interface IdeaItem {
   description: string;
 }
 
-export interface ArchivedIdeaItem extends IdeaItem {
-  category: string;
-  fingerprint: string;
-}
-
 export interface IdeaCategory {
   name: string;
   ideas: IdeaItem[];
@@ -24,16 +19,15 @@ export interface IdeaCategory {
   followUp: string;
 }
 
-export interface IdeaArchiveSuggestion {
+export interface IdeaArchiveEntry {
+  id: string;
+  category: string;
   title: string;
   description: string;
-  category: string;
-  noveltyScore: number;
-  whyItIsUnique: string;
+  createdAt: string;
 }
 
-export interface ArchiveAgentReport {
-  scopedBy: string[];
-  archivedCount: number;
-  uniqueSuggestions: IdeaArchiveSuggestion[];
+export interface ArchiveAgentResult {
+  scopedKeywords: string[];
+  uniqueSuggestions: IdeaArchiveEntry[];
 }
