@@ -1,6 +1,6 @@
-# Brainstorming Engine
+# Brainstorming Engine App
 
-A Vite + React + TypeScript app that asks exactly 3 clarifying questions and then generates categorized idea sets with top picks, variations, and follow-up prompts.
+A production-style React + Vite app for generating categorized brainstorming ideas with a required 3-question intake flow, freemium usage limits, and mock Stripe-powered upgrades.
 
 Now includes an **Idea Archive Agent** that scopes each run, retrieves unique ideas, and stores them in an archive for future suggestion cycles.
 
@@ -11,8 +11,10 @@ npm install
 npm run dev
 ```
 
-## Build
-
-```bash
-npm run build
-```
+## Included stack
+- React 18 + Vite + TypeScript
+- TailwindCSS
+- Zustand state + React Router
+- React Hook Form + Zod
+- React Hot Toast + Lucide icons
+- Stripe JS loader (mock checkout flow)
