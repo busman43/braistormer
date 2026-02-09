@@ -5,6 +5,7 @@ import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { buildIdeas } from '@/lib/brainstorm';
+import { collectArchivedIdeas, retrieveUniqueIdeaSuggestions } from '@/lib/archiveAgent';
 import { useBrainstormStore } from '@/lib/store';
 import type { OutputStyle } from '@/lib/types';
 
@@ -24,7 +25,7 @@ const questions = [
 
 export function Questionnaire() {
   const navigate = useNavigate();
-  const { setAnswer, setResults } = useBrainstormStore();
+  const { results: archivedResults, setAnswer, setResults, setArchiveReport } = useBrainstormStore();
 
   const {
     register,
@@ -37,8 +38,15 @@ export function Questionnaire() {
 
   const onSubmit = (values: FormValues) => {
     (Object.keys(values) as Array<keyof FormValues>).forEach((key) => setAnswer(key, values[key] as OutputStyle & string));
+    const existingArchive = collectArchivedIdeas(archivedResults);
     const ideas = buildIdeas(values);
+    const report = retrieveUniqueIdeaSuggestions({
+      answers: values,
+      existingArchive,
+      freshResults: ideas
+    });
     setResults(ideas);
+    setArchiveReport(report);
     toast.success('Ideas generated!');
     navigate('/results');
   };

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useBrainstormStore } from '@/lib/store';
 
 export function ResultsView() {
-  const { results, reset } = useBrainstormStore();
+  const { results, archiveReport, reset } = useBrainstormStore();
 
   if (!results.length) {
     return (
@@ -28,6 +28,34 @@ export function ResultsView() {
           Reset all
         </button>
       </div>
+
+
+      {archiveReport ? (
+        <article className="rounded-2xl border border-violet-700/40 bg-violet-950/30 p-6">
+          <h2 className="text-xl font-bold text-violet-300">Idea Archive Agent</h2>
+          <p className="mt-2 text-sm text-slate-300">
+            Scoped categories: <span className="font-semibold text-violet-200">{archiveReport.scopedBy.join(', ')}</span> ·
+            Archived ideas scanned: <span className="font-semibold text-violet-200">{archiveReport.archivedCount}</span>
+          </p>
+          <ul className="mt-4 space-y-2 text-sm text-slate-200">
+            {archiveReport.uniqueSuggestions.length ? (
+              archiveReport.uniqueSuggestions.map((idea) => (
+                <li key={idea.title} className="rounded-lg border border-violet-800/50 bg-slate-950/60 p-3">
+                  <p className="font-semibold text-violet-200">
+                    {idea.title} <span className="text-xs text-violet-300">({idea.category})</span>
+                  </p>
+                  <p className="mt-1">{idea.description}</p>
+                  <p className="mt-1 text-xs text-emerald-300">
+                    Novelty score: {idea.noveltyScore} · {idea.whyItIsUnique}
+                  </p>
+                </li>
+              ))
+            ) : (
+              <li className="text-slate-300">No sufficiently unique ideas found for archive suggestions this run.</li>
+            )}
+          </ul>
+        </article>
+      ) : null}
 
       {results.map((category) => (
         <article key={category.name} className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6">
