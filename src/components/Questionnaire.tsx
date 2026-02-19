@@ -4,9 +4,9 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { buildIdeas } from '@/lib/brainstorm';
+import { buildIdeas, runIdeaArchiveAgent } from '@/lib/brainstorm';
 import { useBrainstormStore } from '@/lib/store';
-import type { OutputStyle } from '@/lib/types';
+import type { ClarifyingAnswers, OutputStyle } from '@/lib/types';
 
 const schema = z.object({
   context: z.string().min(8, 'Please share a bit more context.'),
@@ -24,7 +24,7 @@ const questions = [
 
 export function Questionnaire() {
   const navigate = useNavigate();
-  const { setAnswer, setResults } = useBrainstormStore();
+  const { setAnswer, setResults, appendToArchive, ideaArchive, setLatestAgentResult } = useBrainstormStore();
 
   const {
     register,
@@ -38,8 +38,13 @@ export function Questionnaire() {
   const onSubmit = (values: FormValues) => {
     (Object.keys(values) as Array<keyof FormValues>).forEach((key) => setAnswer(key, values[key] as OutputStyle & string));
     const ideas = buildIdeas(values);
+    const agentResult = runIdeaArchiveAgent(values as ClarifyingAnswers, ideas, ideaArchive);
+
     setResults(ideas);
-    toast.success('Ideas generated!');
+    setLatestAgentResult(agentResult);
+    appendToArchive(agentResult.uniqueSuggestions);
+
+    toast.success(`Ideas generated! ${agentResult.uniqueSuggestions.length} unique ideas added to archive.`);
     navigate('/results');
   };
 
