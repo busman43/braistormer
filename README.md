@@ -1,6 +1,8 @@
-# Brainstorming Engine
+# Brainstorming Engine App
 
-Production-ready Vite + React + TypeScript app that asks 3 clarifying questions and generates categorized idea sets with top picks, variations, and follow-up prompts.
+A production-style React + Vite app for generating categorized brainstorming ideas with a required 3-question intake flow, freemium usage limits, and mock Stripe-powered upgrades.
+
+Now includes an **Idea Archive Agent** that scopes each run, retrieves unique ideas, and stores them in an archive for future suggestion cycles.
 
 ## Run locally
 
@@ -9,18 +11,10 @@ npm install
 npm run dev
 ```
 
-## Production build
-
-```bash
-npm run build:prod
-```
-
-Build output is generated in `dist/`.
-
-## Create Windows executable (.exe)
-
-```bash
-npm run build:exe
-```
-
-The executable is created at `release/brainstorming-engine.exe` and serves the built app on `http://localhost:4173`.
+## Included stack
+- React 18 + Vite + TypeScript
+- TailwindCSS
+- Zustand state + React Router
+- React Hook Form + Zod
+- React Hot Toast + Lucide icons
+- Stripe JS loader (mock checkout flow)

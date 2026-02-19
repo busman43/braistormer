@@ -18,3 +18,16 @@ export interface IdeaCategory {
   variations: string[];
   followUp: string;
 }
+
+export interface IdeaArchiveEntry {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  createdAt: string;
+}
+
+export interface ArchiveAgentResult {
+  scopedKeywords: string[];
+  uniqueSuggestions: IdeaArchiveEntry[];
+}

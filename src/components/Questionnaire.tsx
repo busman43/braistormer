@@ -4,15 +4,14 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { buildIdeas } from '@/lib/brainstorm';
+import { buildIdeas, runIdeaArchiveAgent } from '@/lib/brainstorm';
 import { useBrainstormStore } from '@/lib/store';
-
-const outputStyles = ['Quick', 'Detailed', 'Creative', 'Practical', 'Balanced'] as const;
+import type { ClarifyingAnswers, OutputStyle } from '@/lib/types';
 
 const schema = z.object({
-  context: z.string().trim().min(8, 'Please share a bit more context.').max(500, 'Please keep context under 500 characters.'),
-  constraints: z.string().trim().min(5, 'Please add at least one preference or constraint.').max(400, 'Please keep constraints under 400 characters.'),
-  style: z.enum(outputStyles)
+  context: z.string().min(8, 'Please share a bit more context.'),
+  constraints: z.string().min(5, 'Please add at least one preference or constraint.'),
+  style: z.enum(['Quick', 'Detailed', 'Creative', 'Practical', 'Balanced'])
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -25,7 +24,7 @@ const questions = [
 
 export function Questionnaire() {
   const navigate = useNavigate();
-  const { setAnswers, setResults } = useBrainstormStore();
+  const { setAnswer, setResults, appendToArchive, ideaArchive, setLatestAgentResult } = useBrainstormStore();
 
   const {
     register,
@@ -36,16 +35,17 @@ export function Questionnaire() {
     defaultValues: { style: 'Balanced' }
   });
 
-  const onSubmit = async (values: FormValues) => {
-    try {
-      setAnswers(values);
-      setResults(buildIdeas(values));
-      toast.success('Ideas generated!');
-      navigate('/results');
-    } catch (error) {
-      toast.error('Unable to generate ideas. Please try again.');
-      console.error(error);
-    }
+  const onSubmit = (values: FormValues) => {
+    (Object.keys(values) as Array<keyof FormValues>).forEach((key) => setAnswer(key, values[key] as OutputStyle & string));
+    const ideas = buildIdeas(values);
+    const agentResult = runIdeaArchiveAgent(values as ClarifyingAnswers, ideas, ideaArchive);
+
+    setResults(ideas);
+    setLatestAgentResult(agentResult);
+    appendToArchive(agentResult.uniqueSuggestions);
+
+    toast.success(`Ideas generated! ${agentResult.uniqueSuggestions.length} unique ideas added to archive.`);
+    navigate('/results');
   };
 
   return (
@@ -77,7 +77,7 @@ export function Questionnaire() {
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-200">Desired Output Style</label>
           <select {...register('style')} className="w-full rounded-lg border border-slate-700 bg-slate-950 p-3 text-slate-100">
-            {outputStyles.map((style) => (
+            {['Quick', 'Detailed', 'Creative', 'Practical', 'Balanced'].map((style) => (
               <option key={style} value={style}>
                 {style}
               </option>

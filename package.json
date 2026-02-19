@@ -1,44 +1,37 @@
 {
-  "name": "brainstorming-engine",
+  "name": "brainstormer-engine",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:prod",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "build:prod": "tsc -b && vite build",
-    "serve:desktop": "node scripts/desktop-server.cjs",
-    "build:exe": "npm run build:prod && pkg scripts/desktop-server.cjs --targets node18-win-x64 --output release/brainstorming-engine.exe"
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@headlessui/react": "^2.1.8",
-    "@hookform/resolvers": "^3.9.0",
-    "lucide-react": "^0.460.0",
+    "@headlessui/react": "^2.2.0",
+    "@hookform/resolvers": "^3.10.0",
+    "@stripe/stripe-js": "^4.10.0",
+    "lucide-react": "^0.474.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-hook-form": "^7.53.2",
-    "react-hot-toast": "^2.4.1",
-    "react-router-dom": "^6.28.0",
-    "zod": "^3.23.8",
-    "zustand": "^5.0.1"
+    "react-hook-form": "^7.54.2",
+    "react-hot-toast": "^2.5.1",
+    "react-router-dom": "^7.1.5",
+    "stripe": "^17.6.0",
+    "zustand": "^5.0.3",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
+    "@types/node": "^22.10.7",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.15",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.11",
-    "vite-plugin-pwa": "^0.20.5",
-    "pkg": "^5.8.1"
-  },
-  "pkg": {
-    "assets": [
-      "dist/**/*"
-    ],
-    "outputPath": "release"
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5"
   }
 }
